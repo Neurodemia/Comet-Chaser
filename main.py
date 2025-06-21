@@ -11,6 +11,16 @@ from particle import Particle
 
 def main():
     pygame.init()
+    try:
+        pygame.mixer.init()
+        pew_sound = pygame.mixer.Sound("pew.wav")
+        boom_sound = pygame.mixer.Sound("boom.wav")
+        static_sound = pygame.mixer.Sound("static.wav")
+        static_sound.set_volume(0.2)
+        static_sound.play(loops=-1)
+    except pygame.error:
+        pew_sound = boom_sound = static_sound = None
+        print("Sound system not available. Effects will be silent.")
     background_img = pygame.image.load("Nebulous.png")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     enlarged_background = pygame.transform.scale(background_img, (1080, 600))
@@ -33,10 +43,11 @@ def main():
     Explosion.containers = (explosions, updateable, drawable)
     Particle.containers = (particles, updateable, drawable)
     AsteroidField.containers = (updateable)
-    player_1 = Player(x=SCREEN_WIDTH/2, y=SCREEN_HEIGHT/2)
+    player_1 = Player(x=SCREEN_WIDTH/2, y=SCREEN_HEIGHT/2, pew_sound=pew_sound)
     img_x = (SCREEN_WIDTH - 1080) // 2
     img_y = (SCREEN_HEIGHT - 600) // 2
     field = AsteroidField()
+    Asteroid.boom_sound = boom_sound
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

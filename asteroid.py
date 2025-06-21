@@ -57,6 +57,8 @@ class Asteroid(CircleShape):
 
     def split(self):
         self.kill()
+        if Asteroid.boom_sound:
+            Asteroid.boom_sound.play()
         if ASTEROID_MIN_RADIUS < self.radius < ASTEROID_LARGE_MIN_RADIUS:
             for _ in range(40):
                 Particle(self.position)
