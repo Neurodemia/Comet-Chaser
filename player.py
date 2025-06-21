@@ -9,6 +9,12 @@ class Player(CircleShape):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.timer = 0
+        self.invulnerable = False
+        self.invulnerable_timer = 0
+        self.blink_timer = 0
+        self.image = pygame.image.load("ship.png").convert_alpha()
+        self.image = pygame.transform.rotate(self.image, 180)
+        self.image = pygame.transform.scale(self.image, (60, 60))
 
     # in the player class
     def triangle(self):
@@ -20,7 +26,12 @@ class Player(CircleShape):
         return [a, b, c]
 
     def draw(self, screen):
-        pygame.draw.polygon(screen, "white", self.triangle(), 2)
+        if self.invulnerable and int(self.blink_timer * 10) % 2 == 0:
+            # Skip drawing to create the blink effect (roughly 5 blinks per second)
+            return
+        rotated_image = pygame.transform.rotate(self.image, -self.rotation)
+        rect = rotated_image.get_rect(center=(int(self.position.x), int(self.position.y)))
+        screen.blit(rotated_image, rect)
 
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
@@ -40,6 +51,11 @@ class Player(CircleShape):
 
     def update(self, dt):
         self.timer -= dt
+        if self.invulnerable:
+            self.blink_timer += dt
+            self.invulnerable_timer -= dt
+            if self.invulnerable_timer <= 0:
+                self.invulnerable = False
 
         keys = pygame.key.get_pressed()
 
